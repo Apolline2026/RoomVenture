@@ -153,11 +153,13 @@ const TH={"rug": ["data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAcFBQ
 const KEYS=['rug','lamp','art','cushion'];
 const NAME={rug:'rug',lamp:'floor lamp',art:'wall art',cushion:'cushions'};
 const SPON={rug:1,lamp:1}; // the two sponsored placements (index into CAT[k])
-const FEEDBACK_URL=''; // paste your Google Apps Script web-app URL here (see setup notes). Empty = nothing is sent anywhere.
+const SUPABASE_URL='https://nmhjhokknyuwnhiqbvou.supabase.co'; // e.g. https://abcdxyz.supabase.co  (Project Settings > API > Project URL)
+const SUPABASE_ANON_KEY='sb_publishable_gFT3oz54eUpHfZhdqQc_0Q_As8GuCtB'; // the public 'anon' / publishable key (safe in the page: the table only allows inserts)
+const FEEDBACK_URL=(SUPABASE_URL&&SUPABASE_ANON_KEY)?SUPABASE_URL:''; // empty = nothing is sent anywhere. // paste your Google Apps Script web-app URL here (see setup notes). Empty = nothing is sent anywhere.
 const SID=Array.from(crypto.getRandomValues(new Uint8Array(6)),b=>b.toString(16).padStart(2,'0')).join(''); // random per page load, no cookie, not linked to a person
 window.__log=[];
 function log(ev,d){const row={sid:SID,t:new Date().toISOString(),ev:ev,d:d||{}};window.__log.push(row);
- if(!FEEDBACK_URL)return;try{fetch(FEEDBACK_URL,{method:'POST',mode:'no-cors',keepalive:true,headers:{'Content-Type':'text/plain'},body:JSON.stringify(row)}).catch(()=>{})}catch(_){}} // optional: paste a URL that accepts a JSON POST to collect the final answers. Empty = nothing is sent anywhere.
+ if(!FEEDBACK_URL)return;try{fetch(SUPABASE_URL+'/rest/v1/events',{method:'POST',keepalive:true,headers:{'Content-Type':'application/json','apikey':SUPABASE_ANON_KEY,'Authorization':'Bearer '+SUPABASE_ANON_KEY,'Prefer':'return=minimal'},body:JSON.stringify({sid:row.sid,t:row.t,ev:row.ev,d:row.d})}).catch(()=>{})}catch(_){}} // optional: paste a URL that accepts a JSON POST to collect the final answers. Empty = nothing is sent anywhere.
 const ASK=['Yes, I’d be completely comfortable','Probably yes, with some reassurance','Not sure','Probably not','No, I wouldn’t do it'];
 const WHY=['Where my images are stored','Who could see inside my home','The time and effort it takes','Whether the result is accurate','Nothing, I’m fine with it'];
 const CAT={
